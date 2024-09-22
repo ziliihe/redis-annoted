@@ -24,6 +24,7 @@ uint64_t intrev64(uint64_t v);
 
 /* variants of the function doing the actual conversion only if the target
  * host is big endian */
+// 就是输出整数本身，只是保证在大端的小端机器上数据一致
 #if (BYTE_ORDER == LITTLE_ENDIAN)
 #define memrev16ifbe(p) ((void)(0))
 #define memrev32ifbe(p) ((void)(0))

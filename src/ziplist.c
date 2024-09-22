@@ -1148,12 +1148,16 @@ unsigned char *ziplistPush(unsigned char *zl, unsigned char *s, unsigned int sle
 /* Returns an offset to use for iterating with ziplistNext. When the given
  * index is negative, the list is traversed back to front. When the list
  * doesn't contain an element at the provided index, NULL is returned. */
+
+// 定位压缩列表的节点
 unsigned char *ziplistIndex(unsigned char *zl, int index) {
     unsigned char *p;
     unsigned int prevlensize, prevlen = 0;
     size_t zlbytes = intrev32ifbe(ZIPLIST_BYTES(zl));
+    // 负数，反向遍历，-1 就是从尾巴开始的第一个元素
     if (index < 0) {
         index = (-index)-1;
+        // 从尾部开始
         p = ZIPLIST_ENTRY_TAIL(zl);
         if (p[0] != ZIP_END) {
             /* No need for "safe" check: when going backwards, we know the header
@@ -1162,6 +1166,7 @@ unsigned char *ziplistIndex(unsigned char *zl, int index) {
             ZIP_DECODE_PREVLENSIZE(p, prevlensize);
             assert(p + prevlensize < zl + zlbytes - ZIPLIST_END_SIZE);
             ZIP_DECODE_PREVLEN(p, prevlensize, prevlen);
+            // 此时 index 已经是正数了。正常从尾部遍历
             while (prevlen > 0 && index--) {
                 p -= prevlen;
                 assert(p >= zl + ZIPLIST_HEADER_SIZE && p < zl + zlbytes - ZIPLIST_END_SIZE);
@@ -1169,7 +1174,9 @@ unsigned char *ziplistIndex(unsigned char *zl, int index) {
             }
         }
     } else {
+        // 正数，头部开始
         p = ZIPLIST_ENTRY_HEAD(zl);
+        // 从头部遍历
         while (index--) {
             /* Use the "safe" length: When we go forward, we need to be careful
              * not to decode an entry header if it's past the ziplist allocation. */
@@ -1264,7 +1271,7 @@ unsigned char *ziplistInsert(unsigned char *zl, unsigned char *p, unsigned char 
  * Also update *p in place, to be able to iterate over the
  * ziplist, while deleting entries. */
 unsigned char *ziplistDelete(unsigned char *zl, unsigned char **p) {
-    size_t offset = *p-zl;
+    size_t offset = *p-zl;// 指针相减吗？ zl 是压缩列表开始的位置，*p 是要删除的元素
     zl = __ziplistDelete(zl,*p,1);
 
     /* Store pointer to current element in p, because ziplistDelete will

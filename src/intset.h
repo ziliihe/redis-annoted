@@ -34,7 +34,7 @@
 
 typedef struct intset {
     uint32_t encoding;
-    uint32_t length;
+    uint32_t length; // 集合长度
     int8_t contents[];
 } intset;
 
