@@ -906,9 +906,11 @@ struct RedisModuleDigest {
 struct redisObject {
     unsigned type:4;
     unsigned encoding:4;
+    // 最后一次被命令程序访问的时间
     unsigned lru:LRU_BITS; /* LRU time (relative to global lru_clock) or
                             * LFU data (least significant 8 bits frequency
                             * and most significant 16 bits access time). */
+    // 引用计数
     int refcount;
     void *ptr;
 };
@@ -1348,7 +1350,7 @@ typedef struct zskiplistNode {
     struct zskiplistLevel {
         struct zskiplistNode *forward;
         unsigned long span;
-    } level[];
+    } level[]; // 这个级别有什么用呢？
 } zskiplistNode;
 
 typedef struct zskiplist {
@@ -1561,6 +1563,7 @@ struct redisServer {
     mode_t umask;               /* The umask value of the process on startup */
     int hz;                     /* serverCron() calls frequency in hertz */
     int in_fork_child;          /* indication that this is a fork child */
+    // 数据库数组
     redisDb *db;
     dict *commands;             /* Command table */
     dict *orig_commands;        /* Command table before command renaming. */
@@ -1758,6 +1761,7 @@ struct redisServer {
     int active_defrag_cycle_max;       /* maximal effort for defrag in CPU percentage */
     unsigned long active_defrag_max_scan_fields; /* maximum number of fields of set/hash/zset/list to process from within the main dict scan */
     size_t client_max_querybuf_len; /* Limit for client query buffer length */
+    // 初始化数据库时需要创建数据库的数量
     int dbnum;                      /* Total number of configured DBs */
     int supervised;                 /* 1 if supervised, 0 otherwise. */
     int supervised_mode;            /* See SUPERVISED_* */

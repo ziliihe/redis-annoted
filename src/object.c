@@ -346,6 +346,7 @@ void freeStreamObject(robj *o) {
     freeStream(o->ptr);
 }
 
+// 引用计数对象增加1
 void incrRefCount(robj *o) {
     if (o->refcount < OBJ_FIRST_SPECIAL_REFCOUNT) {
         o->refcount++;
@@ -358,6 +359,7 @@ void incrRefCount(robj *o) {
     }
 }
 
+// 引用计数对象减少 1
 void decrRefCount(robj *o) {
     if (o->refcount == 1) {
         switch(o->type) {
