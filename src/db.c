@@ -2060,7 +2060,10 @@ int keyIsExpired(redisDb *db, robj *key) {
  * The return value of the function is KEY_VALID if the key is still valid.
  * The function returns KEY_EXPIRED if the key is expired BUT not deleted,
  * or returns KEY_DELETED if the key is expired and deleted. */
+// 惰性删除
 keyStatus expireIfNeeded(redisDb *db, robj *key, int flags) {
+    // key 未过期
+    // 惰性删除禁用
     if ((!keyIsExpired(db,key)) ||
         (server.lazy_expire_disabled) ||
         (flags & EXPIRE_ALLOW_ACCESS_EXPIRED))

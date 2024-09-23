@@ -972,8 +972,11 @@ typedef struct replBufBlock {
  * database. The database number is the 'id' field in the structure. */
 typedef struct redisDb {
     kvstore *keys;              /* The keyspace for this DB */
+    // 集合
     kvstore *expires;           /* Timeout of keys with a timeout set */
     ebuckets hexpires;          /* Hash expiration DS. Single TTL per hash (of next min field to expire) */
+    // 四个键空间？
+    // 保存所有键值对
     dict *blocking_keys;        /* Keys with clients waiting for data (BLPOP)*/
     dict *blocking_keys_unblock_on_nokey;   /* Keys with clients waiting for
                                              * data, and should be unblocked if key is deleted (XREADEDGROUP).
@@ -1164,6 +1167,7 @@ typedef struct client {
     uint64_t flags;         /* Client flags: CLIENT_* macros. */
     connection *conn;
     int resp;               /* RESP protocol version. Can be 2 or 3. */
+    // 记录客户端当前正在使用的数据库
     redisDb *db;            /* Pointer to currently SELECTed DB. */
     robj *name;             /* As set by CLIENT SETNAME. */
     robj *lib_name;         /* The client library name as set by CLIENT SETINFO. */

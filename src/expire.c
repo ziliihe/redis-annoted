@@ -184,6 +184,7 @@ static inline void activeExpireHashFieldCycle(int type) {
     }
 }
 
+// 定期删除
 void activeExpireCycle(int type) {
     /* Adjust the running parameters according to the configured expire
      * effort. The default effort is 1, and the maximum configurable effort
