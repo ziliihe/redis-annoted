@@ -1297,7 +1297,9 @@ typedef struct aclInfo {
 } aclInfo;
 
 struct saveparam {
+    // 多少秒内
     time_t seconds;
+    // 有多少条记录被修改
     int changes;
 };
 
@@ -1820,7 +1822,7 @@ struct redisServer {
                                         default no. (for testings). */
 
     /* RDB persistence */
-    long long dirty;                /* Changes to DB from the last save */
+    long long dirty;                /* Changes to DB from the last save 距离上次修改的已经改变的记录数量 */
     long long dirty_before_bgsave;  /* Used to restore dirty on failed BGSAVE */
     long long rdb_last_load_keys_expired;  /* number of expired keys when loading RDB */
     long long rdb_last_load_keys_loaded;   /* number of loaded keys when loading RDB */
@@ -1832,6 +1834,7 @@ struct redisServer {
     int rdb_checksum;               /* Use RDB checksum? */
     int rdb_del_sync_files;         /* Remove RDB files used only for SYNC if
                                        the instance does not use persistence. */
+    // 上一次成功保存的时间
     time_t lastsave;                /* Unix time of last successful save */
     time_t lastbgsave_try;          /* Unix time of last attempted bgsave */
     time_t rdb_save_time_last;      /* Time used by last RDB save run. */
