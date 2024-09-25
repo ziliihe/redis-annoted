@@ -2038,6 +2038,7 @@ int _writeToClient(client *c, ssize_t *nwritten) {
  * This function is called by threads, but always with handler_installed
  * set to 0. So when handler_installed is set to 0 the function must be
  * thread safe. */
+// 将命令回复返回给客户端
 int writeToClient(client *c, int handler_installed) {
     /* Update total number of writes on server */
     atomicIncr(server.stat_total_writes_processed, 1);
@@ -2715,6 +2716,7 @@ int processInputBuffer(client *c) {
     return C_OK;
 }
 
+// 命令请求处理器
 void readQueryFromClient(connection *conn) {
     client *c = connGetPrivateData(conn);
     int nread, big_arg = 0;

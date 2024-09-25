@@ -1289,6 +1289,14 @@ void cronUpdateMemoryStats(void) {
  * a macro is used: run_with_period(milliseconds) { .... }
  */
 
+// 定期操作
+// 1. 更新服务器的各类统计信息
+// 2. 清理数据库中的过期键值对
+// 3. 关闭和清理连接失效的客户端
+// 4. 尝试进行 AOF 或者 RDB 持久化操作
+// 5. 若是服务端，定期同步
+// 6. 集群， 定期同步和连接测试
+// 7. 可以通过配置 hz 来调整每秒执行的次数
 int serverCron(struct aeEventLoop *eventLoop, long long id, void *clientData) {
     int j;
     UNUSED(eventLoop);
@@ -1299,13 +1307,16 @@ int serverCron(struct aeEventLoop *eventLoop, long long id, void *clientData) {
      * handler if we don't return here fast enough. */
     if (server.watchdog_period) watchdogScheduleSignal(server.watchdog_period);
 
+    // 获取配置文件没秒执行的次数
     server.hz = server.config_hz;
     /* Adapt the server.hz value to the number of configured clients. If we have
      * many clients, we want to call serverCron() with an higher frequency. */
     if (server.dynamic_hz) {
+        // 根据客户端数量和设置的每秒执行的事件频率比例来判断是否加倍当前执行频率
         while (listLength(server.clients) / server.hz >
                MAX_CLIENTS_PER_CLOCK_TICK)
         {
+            // 执行加倍，直到能够确保处理当前客户端的需求获取到达极限
             server.hz *= 2;
             if (server.hz > CONFIG_MAX_HZ) {
                 server.hz = CONFIG_MAX_HZ;
@@ -1319,6 +1330,7 @@ int serverCron(struct aeEventLoop *eventLoop, long long id, void *clientData) {
 
     monotime cron_start = getMonotonicUs();
 
+    // 100 毫秒运行一次
     run_with_period(100) {
         long long stat_net_input_bytes, stat_net_output_bytes;
         long long stat_net_repl_input_bytes, stat_net_repl_output_bytes;

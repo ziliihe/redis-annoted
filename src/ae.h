@@ -33,7 +33,7 @@
 #define AE_CALL_BEFORE_SLEEP (1<<3)
 #define AE_CALL_AFTER_SLEEP (1<<4)
 
-#define AE_NOMORE -1
+#define AE_NOMORE -1 /* 定时事件标志，其他就是周期事件 */
 #define AE_DELETED_EVENT_ID -1
 
 /* Macros */
@@ -49,6 +49,7 @@ typedef void aeBeforeSleepProc(struct aeEventLoop *eventLoop);
 
 /* File event structure */
 typedef struct aeFileEvent {
+    // ae 事件类型
     int mask; /* one of AE_(READABLE|WRITABLE|BARRIER) */
     aeFileProc *rfileProc;
     aeFileProc *wfileProc;
@@ -65,7 +66,7 @@ typedef struct aeTimeEvent {
     struct aeTimeEvent *prev;
     struct aeTimeEvent *next;
     int refcount; /* refcount to prevent timer events from being
-  		   * freed in recursive time event calls. */
+          		   * freed in recursive time event calls. */
 } aeTimeEvent;
 
 /* A fired event */

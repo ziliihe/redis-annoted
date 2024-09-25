@@ -1172,11 +1172,14 @@ typedef struct client {
     robj *name;             /* As set by CLIENT SETNAME. */
     robj *lib_name;         /* The client library name as set by CLIENT SETINFO. */
     robj *lib_ver;          /* The client library version as set by CLIENT SETINFO. */
+    // 客户端输入缓冲区
     sds querybuf;           /* Buffer we use to accumulate client queries. */
     size_t qb_pos;          /* The position we have read in querybuf. */
     size_t querybuf_peak;   /* Recent (100ms or more) peak of querybuf size. */
     int argc;               /* Num of arguments of current command. */
+    // 命令参数
     robj **argv;            /* Arguments of current command. */
+    // 命令参数个数
     int argv_len;           /* Size of argv array (may be more than argc) */
     int original_argc;      /* Num of arguments of original command if arguments were rewritten. */
     robj **original_argv;   /* Arguments of original command if arguments were rewritten. */
@@ -1619,6 +1622,7 @@ struct redisServer {
     connListener listeners[CONN_TYPE_MAX]; /* TCP/Unix/TLS even more types */
     uint32_t socket_mark_id;    /* ID for listen socket marking */
     connListener clistener;     /* Cluster bus listener */
+    // 活跃客户端的链表，保存了所有客户端的状态
     list *clients;              /* List of active clients */
     list *clients_to_close;     /* Clients to close asynchronously */
     list *clients_pending_write; /* There is to write or install handler. */
