@@ -1199,12 +1199,17 @@ typedef struct client {
     list *deferred_reply_errors;    /* Used for module thread safe contexts. */
     size_t sentlen;         /* Amount of bytes already sent in the current
                                buffer or object being sent. */
+    // 创建客户端的时间
     time_t ctime;           /* Client creation time. */
     long duration;          /* Current command duration. Used for measuring latency of blocking/non-blocking cmds */
     int slot;               /* The slot the client is executing against. Set to -1 if no slot is being used */
     dictEntry *cur_script;  /* Cached pointer to the dictEntry of the script being executed. */
+    // 客户端和服务器最后一次进行交互的时间
     time_t lastinteraction; /* Time of the last interaction, used for timeout */
+    // 输出缓冲区第一次到达软限制的时间
     time_t obuf_soft_limit_reached_time;
+    // 0 未通过身份验证
+    // 1 通过身份验证
     int authenticated;      /* Needed when the default user requires auth. */
     int replstate;          /* Replication state if this is a slave. */
     int repl_start_cmd_stream_on_ack; /* Install slave write handler on first ACK. */
