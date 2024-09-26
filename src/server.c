@@ -1035,7 +1035,6 @@ void clientsCron(void) {
     ClientsPeakMemInput[zeroidx] = 0;
     ClientsPeakMemOutput[zeroidx] = 0;
 
-
     while(listLength(server.clients) && iterations--) {
         client *c;
         listNode *head;
@@ -1048,7 +1047,9 @@ void clientsCron(void) {
         /* The following functions do different service checks on the client.
          * The protocol is that they return non-zero if the client was
          * terminated. */
+        // 超时释放
         if (clientsCronHandleTimeout(c,now)) continue;
+        // 输入缓冲区处理
         if (clientsCronResizeQueryBuffer(c)) continue;
         if (clientsCronResizeOutputBuffer(c,now)) continue;
 
@@ -1063,6 +1064,7 @@ void clientsCron(void) {
         if (!updateClientMemUsageAndBucket(c))
             updateClientMemoryUsage(c);
 
+        // 超过输出缓冲区释放客户端
         if (closeClientOnOutputBufferLimitReached(c, 0)) continue;
     }
 }
@@ -1077,6 +1079,7 @@ void databasesCron(void) {
         if (iAmMaster()) {
             activeExpireCycle(ACTIVE_EXPIRE_CYCLE_SLOW);
         } else {
+            // 清理过期键
             expireSlaveKeys();
         }
     }
@@ -1415,13 +1418,16 @@ int serverCron(struct aeEventLoop *eventLoop, long long id, void *clientData) {
     }
 
     /* We need to do a few operations on clients asynchronously. */
+    // 客户端可用性检查
     clientsCron();
 
     /* Handle background operations on Redis databases. */
+    // 数据库检查，删除其中的过期键
     databasesCron();
 
     /* Start a scheduled AOF rewrite if this was requested by the user while
      * a BGSAVE was in progress. */
+    // 检查是否有 BGSAVE 命令是否执行
     if (!hasActiveChildProcess() &&
         server.aof_rewrite_scheduled &&
         !aofRewriteLimited())
@@ -1460,6 +1466,7 @@ int serverCron(struct aeEventLoop *eventLoop, long long id, void *clientData) {
         }
 
         /* Trigger an AOF rewrite if needed. */
+        // 检查是否有 BGREWRITEAOF 命令是否执行
         if (server.aof_state == AOF_ON &&
             !hasActiveChildProcess() &&
             server.aof_rewrite_perc &&
@@ -2069,10 +2076,13 @@ void initServerConfig(void) {
     initConfigValues();
     updateCachedTime(1);
     server.cmd_time_snapshot = server.mstime;
+    // 设置服务器的运行 ID
     getRandomHexChars(server.runid,CONFIG_RUN_ID_SIZE);
+    // 为运行 ID 加上结尾字符
     server.runid[CONFIG_RUN_ID_SIZE] = '\0';
     changeReplicationId();
     clearReplicationId2();
+    // 设置默认服务端的频率
     server.hz = CONFIG_DEFAULT_HZ; /* Initialize it ASAP, even if it may get
                                       updated later after loading the config.
                                       This value may be used before the server
@@ -2080,6 +2090,7 @@ void initServerConfig(void) {
     server.timezone = getTimeZone(); /* Initialized by tzset(). */
     server.configfile = NULL;
     server.executable = NULL;
+    // 设置服务器的运行架构
     server.arch_bits = (sizeof(long) == 8) ? 64 : 32;
     server.bindaddr_count = CONFIG_DEFAULT_BINDADDR_COUNT;
     for (j = 0; j < CONFIG_DEFAULT_BINDADDR_COUNT; j++)

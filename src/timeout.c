@@ -45,6 +45,7 @@ int clientsCronHandleTimeout(client *c, mstime_t now_ms) {
         (now - c->lastinteraction > server.maxidletime))
     {
         serverLog(LL_VERBOSE,"Closing idle client");
+        // 客户端与服务端连接超时，释放客户端
         freeClient(c);
         return 1;
     } else if (c->flags & CLIENT_BLOCKED) {
